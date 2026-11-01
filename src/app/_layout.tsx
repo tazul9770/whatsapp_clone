@@ -1,47 +1,38 @@
-import { storage } from "@/utils/utils";
-import { Redirect, Stack } from "expo-router";
+import { Redirect } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { Provider, useSelector } from "react-redux";
+import store from "../redux/store";
 
 SplashScreen.preventAutoHideAsync();
 
-const RootLayout = () => {
-  const [isLogin, setIsLogin] = useState(false);
-  const access_token = storage.getString("access_token");
+interface RootState {
+  auth: {
+    isAuthenticated: boolean;
+  };
+  product: string;
+}
+
+const AuthGuard = () => {
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
 
   useEffect(() => {
-    setTimeout(() => {
-      SplashScreen.hideAsync();
-    }, 2000);
+    SplashScreen.hideAsync().catch(() => {
+      // Splash screen already hidden or unavailable
+    });
   }, []);
 
-  useEffect(() => {
-    // check here user is already login
-    if (access_token) {
-      setIsLogin(true);
-    }
-  }, [access_token]);
-
-  return (
-    <>
-      <Stack screenOptions={{ headerShown: false }} />
-      {isLogin ? <Redirect href={"/(main)"} /> : <Redirect href={"/(auth)"} />}
-    </>
+  return isAuthenticated ? (
+    <Redirect href={"/(main)"} />
+  ) : (
+    <Redirect href={"/(auth)"} />
   );
 };
 
-export default RootLayout;
-
-// import { Stack } from "expo-router";
-// import { Provider } from "react-redux";
-// import store from "../redux/store";
-
-// const RootLayout = () => {
-//   return (
-//     <Provider store={store}>
-//       <Stack></Stack>
-//     </Provider>
-//   );
-// };
-
-// export default RootLayout;
+export default function RootLayout() {
+  return (
+    <Provider store={store}>
+      <AuthGuard />
+    </Provider>
+  );
+}

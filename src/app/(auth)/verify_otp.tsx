@@ -2,15 +2,21 @@ import Button from "@/components/small/button";
 import { storage } from "@/utils/utils";
 import OTPInput from "@codsod/react-native-otp-input";
 import { AntDesign } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
+import { useDispatch } from "react-redux";
+import { login } from "@/redux/authSlice";
 
 const VerifyOTP = () => {
+  const dispatch = useDispatch();
   const [otp, setOTP] = useState("");
   const onPress = () => {
-    storage.set("access_token", "ghsdghhjsdhjsd")
+    storage.set("access_token", "ghsdghhjsdhjsd");
+    dispatch(login());
+    router.replace("/(main)");
   };
   return (
     <SafeAreaView style={styles.container}>
